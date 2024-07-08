@@ -11,7 +11,6 @@ from .dbconf import conf
 
 
 def setup():
-    subprocess_run(subprocess, f'{settings.PYENV_DEFAULT_PIP_RUN} install PyMySQL')
     conf_path = Path.joinpath(make_dir(Path.joinpath(settings.MEDIA_ROOT, 'db_mysql')), 'dbconf.json')
     with open(conf_path, 'w', encoding='utf-8') as f:
         json.dump(conf, f, ensure_ascii=False)
@@ -22,6 +21,11 @@ def setup():
     with open(init_path / 'init', 'w') as f:
         f.write('')
 
+    return True
+
+
+def install():
+    subprocess_run(subprocess, f'{settings.PYENV_DEFAULT_PIP_RUN} install PyMySQL')
     return True
 
 
