@@ -20,12 +20,12 @@ def setup():
         init_path.mkdir()
     with open(init_path / 'init', 'w') as f:
         f.write('')
-
     return True
 
 
 def install():
-    subprocess_run(subprocess, f'{settings.PYENV_DEFAULT_PIP_RUN} install PyMySQL')
+    result = subprocess_run(subprocess, f'{settings.PYENV_DEFAULT_PIP_RUN} install PyMySQL')
+    print(result)
     return True
 
 
