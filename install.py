@@ -16,6 +16,12 @@ def setup():
     with open(conf_path, 'w', encoding='utf-8') as f:
         json.dump(conf, f, ensure_ascii=False)
 
+    init_path = settings.APP_FILES / 'db_mysql'
+    if not init_path.exists():
+        init_path.mkdir()
+    with open(init_path / 'init', 'w') as f:
+        f.write('')
+
     return True
 
 

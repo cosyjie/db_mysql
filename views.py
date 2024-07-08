@@ -4,6 +4,7 @@ import shutil
 from pathlib import Path
 import json
 
+from django.shortcuts  import redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic.base import TemplateView, RedirectView
 from django.views.generic.list import ListView
@@ -20,6 +21,12 @@ from.mysqlconn import DbAction
 from .forms import DbInstallForm, MysqlUninstallForm, CreateDatabaseForm, SchemaDeleteForm, RootPasswordForm
 
 conf_path = Path.joinpath(make_dir(Path.joinpath(settings.MEDIA_ROOT, 'db_mysql')), 'dbconf.json')
+
+
+def mysql_init(request):
+    from .install import setup
+    setup()
+    return redirect('module_database:db_mysql:index')
 
 
 def get_conf():
@@ -60,7 +67,10 @@ class DbMysqlMixin(ModuleDatabaseMixin):
                     for message in error_message:
                         if not message.startswith('mysqladmin: [Warning] Using a password on the command line'):
                             context['login_info'] += message + '</br>'
-
+        context['is_init'] = False
+        init_file = settings.APP_FILES / 'db_mysql' / 'init'
+        if init_file.exists():
+            context['is_init'] = True
         return context
 
 

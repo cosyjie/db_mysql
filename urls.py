@@ -6,6 +6,7 @@ from . import views
 app_name = 'db_mysql'
 
 urlpatterns = [
+    path('init/', login_required(views.mysql_init), name='init'),
     path('index/', login_required(views.DbIndexView.as_view()), name='index'),
     path('install/', login_required(views.DbInstallView.as_view()), name='install'),
     path('action/<str:action>/', login_required(views.DbActionView.as_view()), name='action'),
