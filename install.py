@@ -23,10 +23,10 @@ def setup():
     return True
 
 
-def install():
-    result = subprocess_run(subprocess, f'{settings.PYENV_DEFAULT_PIP_RUN} install PyMySQL')
-    print(result)
-    return True
+# def install():
+#     result = subprocess_run(subprocess, f'{settings.PYENV_DEFAULT_PIP_RUN} install PyMySQL')
+#     print(result)
+#     return True
 
 
 def uninstall():
