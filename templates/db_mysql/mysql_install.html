@@ -1,0 +1,15 @@
+{% extends 'layout_panel.html' %}
+{% load appcommon_html %}
+
+{% block pagecontent %}
+<div class="card">
+<form class="layui-form" method="post">{% csrf_token %}
+    <div class="card-body">
+    安装程序将把安装包下载到本地后自动安装！（速度取决于您连接到MySQL官网网速）。
+        </br>请等待安装页面自动跳转~
+    </div>
+    <div class="card-footer">{% form_btn 'submit_by_txt' btn_txt='开始安装MySQL' %}</div>
+</form>
+</div>
+{% endblock %}
+

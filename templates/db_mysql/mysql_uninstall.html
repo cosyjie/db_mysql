@@ -1,0 +1,45 @@
+{% extends 'layout_panel.html' %}
+
+{% block js_code %}
+<script type="text/javascript">
+layui.use(function() {
+    var $ = layui.$;
+    var form = layui.form;
+    var layer = layui.layer;
+
+    form.on('submit(submitform)', function(data){
+        layer.confirm(
+            '确定要卸载MySQl吗？',
+            {title: '操作提示', icon: 3}, function(index){
+              document.getElementById("form").submit();
+              layer.close(index);
+            }
+        );
+        return false;
+    });
+});
+</script>
+{% endblock %}
+
+{% block pagecontent %}
+    <div class="card">
+<form id="form" class="layui-form" id="myForm" method="post">
+{% csrf_token %}
+    <div class="card-body">
+<h4>确定要卸载 MySQL 吗？</h4>
+<div class="alert alert-danger alert-dismissible">
+  <h5><i class="icon fas fa-exclamation-triangle"></i>  注意!</h5>
+卸载MySQL将删除数据目录。您的数据将全部丢失且无法恢复~
+</div>
+
+<div class="p-3 bg-gray-light">
+    请在下面输入 <span class="layui-font-18">确定卸载</span>  用于防误操作！注意不要有多余的空格！
+    {{ form.confirm_txt }}
+</div>
+  </div>
+    <div class="card-footer">
+<button class="btn btn-danger layui-btn" lay-submit lay-filter="submitform">卸载MySQL</button>
+    </div>
+</form>
+    </div>
+{% endblock %}

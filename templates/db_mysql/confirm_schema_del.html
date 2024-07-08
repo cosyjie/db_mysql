@@ -1,0 +1,29 @@
+{% extends 'db_mysql/layout_db_mysql.html' %}
+{% load appcommon_html %}
+
+{% block content %}
+{% include 'include_messages.html' %}
+<div class="card">
+<div class="card-header">
+    <h3 class="card-title"> 删除数据库：<span class="text-primary text-bold">{{ schema }}</span></h3>
+</div>
+<form class="layui-form" method="post">{% csrf_token %}
+<div class="card-body">
+    <h4 class="text-danger text-bold">
+        删除数据库将丢失数据！谨慎操作！避免失误！
+    </h4>
+
+    <div class="bg-gray-light mt-2 p-3">
+        请输入要删除的数据库名称，以验证删除！请注意不要有多余的空格！
+        {{ form.schema_name }}
+    </div>
+
+</div>
+<div class="card-footer">
+    {% form_btn 'back' 'submit_by_txt' btn_txt='删除数据库' %}
+</div>
+</form>
+</div>
+
+
+{% endblock %}

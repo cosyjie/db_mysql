@@ -1,0 +1,50 @@
+{% extends 'layout_panel.html' %}
+
+{% block pagecontent %}
+{% if not is_installed %}
+<div class="card">
+<div class="card-body">
+    <p>没有发现 /usr/bin/mysqladmin 您可能没有安装过MySQL，或者您的 <a href="" class="text-bold">参数配置</a> 有误！</p>
+    <p>
+        <a href="{% url 'module_database:db_mysql:install' %}" class="btn btn-success">现在安装</a>
+    </p>
+</div>
+</div>
+{% else %}
+{% if db_version %}
+    <div>版本： {{ db_version }}</div>
+{% endif %}
+<div class="card">
+<div class="card-header">
+    <div class="card-title">
+    {% if is_running == 'running' %}
+        <span class="badge badge-success p-2">已启动</span>
+        <span class="ml-2"><a href="{% url 'module_database:db_mysql:action' '2' %}">停止</a></span>
+        <span class="ml-2"><a href="{% url 'module_database:db_mysql:action' '3' %}">重启</a></span>
+    {% elif is_running == 'stopped' %}
+        <span class="badge badge-danger p-2">未启动</span>
+        <span class="ml-2"><a href="{% url 'module_database:db_mysql:action' '1' %}">启动</a></span>
+    {% else %}
+        未知状态
+    {% endif %}
+{#        <span class="ml-2"><a href="{% url 'module_database:db_mysql:options_users' %}">设置</a></span>#}
+    </div>
+    <div class="card-tools">
+        <a href="{% url 'module_database:db_mysql:uninstall' %}" title="卸载"><i class="fas fa-trash"></i></a>
+    </div>
+</div>
+</div>
+{% if is_running == 'stopped' %}
+   MySQL 服务没有启动，请先尝试<a href="{% url 'module_database:db_mysql:action' '1' %}">启动服务</a>
+{% endif %}
+
+{% if is_running == 'running' and not login_status %}
+无法登录
+{% endif %}
+
+{% if is_running == 'running' and login_status %}
+{% block content %}{% endblock %}
+{% endif %}
+
+{% endif %}
+{% endblock %}

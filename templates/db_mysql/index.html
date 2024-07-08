@@ -1,0 +1,44 @@
+{% extends 'db_mysql/layout_db_mysql.html' %}
+
+{% block content %}
+<div class="card">
+<div class="card-header">
+    <h3 class="card-title">
+        <a href="{% url 'module_database:db_mysql:schema_create' %}" class="btn btn-success">新建数据库</a>
+    </h3>
+    <div class="card-tools">
+    <a href="{% url 'module_database:db_mysql:root_pass' %}" class="btn btn-default">root密码</a>
+{% if root_remote %}
+    <a href="{% url 'module_database:db_mysql:root_remote' 0 %}" class="btn btn-default">关闭 root 远程许可</a>
+{% else %}
+    <a href="{% url 'module_database:db_mysql:root_remote' 1 %}" class="btn btn-default">开启 root 远程许可</a>
+{% endif %}
+    </div>
+</div>
+<div class="card-body p-0">
+<table class="table table-s table-bordered table-hover table-sm">
+    <thead class="thead-light">
+    <tr>
+        <th>数据库名</th><th>默认字符集</th><th>排序规则</th><th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for object in object_list %}
+    <tr>
+        <td>
+            <a href="{% url 'module_database:db_mysql:table_list' object.schema_name %}">{{ object.schema_name }}</a>
+        </td>
+        <td>{{ object.default_character_set_name }}</td>
+        <td>{{ object.default_collation_name }}</td>
+        <td>
+{#            <a href="">权限</a>#}
+            <a href="{% url 'module_database:db_mysql:schema_del' object.schema_name %}">删除</a>
+{#            <a href="">工具</a>#}
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+</div>
+</div>
+{% endblock %}
