@@ -17,7 +17,6 @@ from appcommon.helper import subprocess_run, make_dir
 from appcommon.mixin import JSONResponseMixin
 from panel.module_database.views import ModuleDatabaseMixin
 
-from.mysqlconn import DbAction
 from .forms import DbInstallForm, MysqlUninstallForm, CreateDatabaseForm, SchemaDeleteForm, RootPasswordForm
 
 conf_path = Path.joinpath(make_dir(Path.joinpath(settings.MEDIA_ROOT, 'db_mysql')), 'dbconf.json')
@@ -82,6 +81,8 @@ class DbIndexView(DbMysqlMixin, ListView):
         context['page_title'] = 'MySQL数据库管理'
         db_conf = get_conf()
         try:
+            from .mysqlconn import DbAction
+
             dbaction = DbAction(
                 host=db_conf['host'], port=db_conf['port'], user=db_conf['user'],
                 password=decrypt_password(db_conf['password']),
@@ -101,6 +102,7 @@ class DbIndexView(DbMysqlMixin, ListView):
         db_conf = get_conf()
         object_list = []
         try:
+            from .mysqlconn import DbAction
             dbaction = DbAction(
                 host=db_conf['host'], port=db_conf['port'], user=db_conf['user'],
                 database='information_schema',
@@ -219,6 +221,7 @@ class SchemaCreateView(DbMysqlMixin, FormView):
         return context
 
     def form_valid(self, form):
+        from .mysqlconn import DbAction
         schema_name = form.cleaned_data.get('schema_name').strip()
         schema_charset = form.cleaned_data.get('schema_charset').strip()
         db_conf = get_conf()
@@ -280,6 +283,7 @@ class TablesListView(DbMysqlMixin, ListView):
         return context
 
     def get_queryset(self):
+        from .mysqlconn import DbAction
         db_conf = get_conf()
         dbaction = DbAction(
             host=db_conf['host'], port=db_conf['port'], user=db_conf['user'],
@@ -299,6 +303,7 @@ class RootRemoteActionView(DbMysqlMixin, RedirectView):
     url = reverse_lazy('module_database:db_mysql:index')
 
     def get(self, request, *args, **kwargs):
+        from .mysqlconn import DbAction
         status = kwargs.get('status')
         db_conf = get_conf()
         get_pass = decrypt_password(db_conf['password'])
