@@ -1,6 +1,18 @@
 {% extends 'layout_panel.html' %}
 
 {% block pagecontent %}
+
+{% if not is_init %}
+<div class="card">
+<div class="card-body">
+    <p>当前模块需要初始化数据，请点击按钮进行初始化：</p>
+    <p>
+        <a href="{% url 'module_database:db_mysql:init' %}" class="btn btn-danger">初始化数据</a>
+    </p>
+</div>
+</div>
+{% else %}
+
 {% if not is_installed %}
 <div class="card">
 <div class="card-body">
@@ -44,6 +56,8 @@
 
 {% if is_running == 'running' and login_status %}
 {% block content %}{% endblock %}
+{% endif %}
+
 {% endif %}
 
 {% endif %}
