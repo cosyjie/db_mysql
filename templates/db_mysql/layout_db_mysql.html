@@ -1,7 +1,6 @@
 {% extends 'layout_panel.html' %}
 
 {% block pagecontent %}
-
 {% if not is_init %}
 <div class="card">
 <div class="card-body">
@@ -11,9 +10,9 @@
     </p>
 </div>
 </div>
+{# else is_init#}
 {% else %}
-
-{% if not is_installed %}
+    {% if not is_installed %}
 <div class="card">
 <div class="card-body">
     <p>没有发现 /usr/bin/mysqladmin 您可能没有安装过MySQL，或者您的 <a href="" class="text-bold">参数配置</a> 有误！</p>
@@ -22,7 +21,8 @@
     </p>
 </div>
 </div>
-{% else %}
+{# else is_installed#}
+    {% else %}
 {% if db_version %}
     <div>版本： {{ db_version }}</div>
 {% endif %}
@@ -48,8 +48,8 @@
 </div>
 {% if is_running == 'stopped' %}
    MySQL 服务没有启动，请先尝试<a href="{% url 'module_database:db_mysql:action' '1' %}">启动服务</a>
+{# end is_running#}
 {% endif %}
-
 {% if is_running == 'running' and not login_status %}
 无法登录
 {% endif %}
@@ -58,7 +58,9 @@
 {% block content %}{% endblock %}
 {% endif %}
 
+{#end is_installed#}
+    {% endif %}
+{#end is_init#}
 {% endif %}
 
-{% endif %}
 {% endblock %}

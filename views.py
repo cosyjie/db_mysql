@@ -39,39 +39,41 @@ class DbMysqlMixin(ModuleDatabaseMixin):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['menu'] = 'db_mysql'
-
         context['is_init'] = False
+        context['is_installed'] = False
+        context['login_status'] = False
+        context['is_running'] = '-'
+        context['db_version'] = ''
+        context['login_info'] = ''
+        if not context['is_init']: context['page_title'] = '模块需要初始化'
+        if not context['is_installed']: context['page_title'] = '没有安装MySQL'
+
         init_file = settings.APP_FILES / 'db_mysql' / 'init'
         if init_file.exists():
             context['is_init'] = True
             db_conf = get_conf()
-
-            context['is_installed'] = False
-            context['is_running'] = '-'
-            context['db_version'] = ''
-            context['login_status'] = False
-            context['login_info'] = ''
             if Path.exists(Path(db_conf['mysqladmin'])):
                 context['is_installed'] = True
                 context['db_version'] = subprocess_run(
                     subprocess, f'{db_conf["mysqladmin"]} -V'
                 ).stdout.strip().replace(f'{db_conf["mysqladmin"]}  Ver ', '')
+
                 run_end = subprocess_run(subprocess, 'systemctl status mysqld')
                 if "active (running)" in run_end.stdout:
                     context['is_running'] = "running"
                 elif "inactive (dead)" in run_end.stdout or "failed" in run_end.stdout:
                     context['is_running'] = "stopped"
-
                 if context['is_running'] == "running":
-                    get_pass = decrypt_password(db_conf['password'])
-                    check_login = subprocess_run(subprocess, f'{db_conf["mysqladmin"]} -uroot -p"{get_pass}" status')
-                    if check_login.returncode == 0:
-                        context['login_status'] = True
-                    else:
-                        error_message = check_login.stderr.strip().replace("\x07", "").split('\n')
-                        for message in error_message:
-                            if not message.startswith('mysqladmin: [Warning] Using a password on the command line'):
-                                context['login_info'] += message + '</br>'
+                    if db_conf['password']:
+                        get_pass = decrypt_password(db_conf['password'])
+                        check_login = subprocess_run(subprocess, f'{db_conf["mysqladmin"]} -uroot -p"{get_pass}" status')
+                        if check_login.returncode == 0:
+                            context['login_status'] = True
+                        else:
+                            error_message = check_login.stderr.strip().replace("\x07", "").split('\n')
+                            for message in error_message:
+                                if not message.startswith('mysqladmin: [Warning] Using a password on the command line'):
+                                    context['login_info'] += message + '</br>'
         return context
 
 
@@ -80,26 +82,25 @@ class DbIndexView(DbMysqlMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['page_title'] = 'MySQL数据库管理'
+        if context['is_init'] and context['is_installed'] and context['login_status']:
+            context['page_title'] = 'MySQL数据库管理'
+            if context['login_status']:
+                from .mysqlconn import DbAction
 
-        try:
-            from .mysqlconn import DbAction
-
-            db_conf = get_conf()
-            dbaction = DbAction(
-                host=db_conf['host'], port=db_conf['port'], user=db_conf['user'],
-                password=decrypt_password(db_conf['password']),
-                database='mysql'
-            )
-            dbaction.connect()
-            result = dbaction.select_query("SELECT User, Host FROM user WHERE User = 'root'")[0]
-            context['root_remote'] = False
-            if '%' in result[1]:
-                context['root_remote'] = True
-            dbaction.close()
-        except:
-            pass
+                db_conf = get_conf()
+                dbaction = DbAction(
+                    host=db_conf['host'], port=db_conf['port'], user=db_conf['user'],
+                    password=decrypt_password(db_conf['password']),
+                    database='mysql'
+                )
+                dbaction.connect()
+                result = dbaction.select_query("SELECT User, Host FROM user WHERE User = 'root'")[0]
+                context['root_remote'] = False
+                if '%' in result[1]:
+                    context['root_remote'] = True
+                dbaction.close()
         return context
+
 
     def get_queryset(self):
         object_list = []
@@ -121,8 +122,8 @@ class DbIndexView(DbMysqlMixin, ListView):
                         'default_collation_name': row[3],
                     })
             dbaction.close()
-        except:
-            pass
+        except Exception as e:
+            print(e)
         return object_list
 
 
