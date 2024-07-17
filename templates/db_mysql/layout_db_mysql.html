@@ -51,7 +51,11 @@
 {# end is_running#}
 {% endif %}
 {% if is_running == 'running' and not login_status %}
-无法登录
+<div class="card">
+<div class="card-body">
+    无法登陆！
+</div>
+</div>
 {% endif %}
 
 {% if is_running == 'running' and login_status %}
